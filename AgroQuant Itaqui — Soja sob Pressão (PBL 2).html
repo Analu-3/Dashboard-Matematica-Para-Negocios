@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AgroQuant Itaqui — Soja sob Pressão</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6f1;--sf:#fff;--tx:#1b2620;--mu:#5d6b63;--ln:#d9dfd6;--dk:#14352a;--sy:#5f8a2f;--am:#b8860b;--rd:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1a15;--sf:#17261f;--tx:#e8eee9;--mu:#9bab a2;--mu:#9aaba1;--ln:#2b3d34;--dk:#0b2219;--sy:#8cbf4f;--am:#e0b84a;--rd:#ff8a80}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Public Sans",system-ui,sans-serif;display:flex;min-height:100vh}
+nav{width:230px;background:var(--dk);color:#e8f0e4;padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto;flex:none}
+nav h1{font-size:15px;margin:0 6px 2px;line-height:1.3}nav small{display:block;margin:0 6px 14px;color:#a9c3a0}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;color:inherit;padding:9px 10px;border-radius:6px;font:inherit;cursor:pointer}
+nav button.on{background:var(--sy);color:#fff;font-weight:600}nav button:focus-visible,input:focus-visible,select:focus-visible,.btn:focus-visible{outline:2px solid var(--am);outline-offset:2px}
+main{flex:1;min-width:0;padding:20px 24px 60px;max-width:1150px}
+h2{margin:0 0 4px;font-size:22px;color:var(--dk)}@media(prefers-color-scheme:dark){h2{color:var(--sy)}}
+h3{margin:22px 0 8px;font-size:16px}p.sub{color:var(--mu);margin:0 0 14px}
+.tab{display:none}.tab.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.k{background:var(--sf);border:1px solid var(--ln);border-left:4px solid var(--sy);border-radius:6px;padding:10px 12px}
+.k.calc{border-left-color:var(--am)}.k.hyp{border-left-color:var(--rd)}
+.k b{display:block;font-size:20px}.k span{font-size:12px;color:var(--mu)}
+.box{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:14px;margin:10px 0}
+.cv{position:relative;height:280px}
+.note{font-size:13px;color:var(--mu)}.warn{background:#fff4d6;color:#5a4300;border:1px solid #e7cf85;padding:9px 12px;border-radius:6px;margin:10px 0;font-size:14px}
+@media(prefers-color-scheme:dark){.warn{background:#3a3115;color:#f0dca0;border-color:#6b5a1f}}
+.tag{font-size:11px;font-weight:700;padding:1px 7px;border-radius:9px;color:#fff;background:var(--sy)}.tag.c{background:var(--am)}.tag.h{background:var(--rd)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:8px 0}
+label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:2px}
+input,select{font:inherit;padding:6px 8px;border:1px solid var(--ln);border-radius:5px;background:var(--sf);color:var(--tx);max-width:150px}
+input[type=range]{max-width:none;width:260px}
+.btn{background:var(--sy);color:#fff;border:0;border-radius:6px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid var(--ln);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}td.l,th.l{text-align:left;white-space:normal}
+.fm{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--bg);padding:2px 6px;border-radius:4px}
+.hi{background:#fde3e0}@media(prefers-color-scheme:dark){.hi{background:#4a2420}}
+@media(max-width:760px){body{display:block}nav{width:auto;height:auto;position:sticky;z-index:20;display:flex;gap:4px;overflow-x:auto;padding:8px}nav h1,nav small{display:none}nav button{width:auto;white-space:nowrap;padding:8px 10px}main{padding:14px 12px 50px}}
+</style></head><body>
+<nav id="nav"><h1>AgroQuant Itaqui</h1><small>PBL 2 — Matemática para Negócios</small></nav>
+<main>
+<header><h2 style="font-size:25px">AgroQuant Itaqui — Inteligência de Mercado e Otimização da Soja</h2><p class="sub">PBL 2 — Matemática para Negócios · Soja sob Pressão. Legenda: <span class="tag">DADO</span> importado de fonte autorizada · <span class="tag c">CÁLCULO</span> do modelo · <span class="tag h">HIPÓTESE</span> informada por você</p></header>
+
+<section class="tab" id="t-vg"><h2>Visão geral</h2><p class="sub">Indicadores do filtro atual. Dados vêm do CSV do Comex Stat importado na aba “Dados e metodologia”.</p>
+<div id="flt" class="row"></div><div class="grid" id="kpi"></div>
+<div class="box"><div class="cv"><canvas id="c-vg1"></canvas></div></div>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"><div class="box"><div class="cv"><canvas id="c-vg2"></canvas></div></div><div class="box"><div class="cv"><canvas id="c-vg3"></canvas></div></div></div></section>
+
+<section class="tab" id="t-ex"><h2>Exportações e preços</h2><p class="sub">Soja em grão, NCM 1201.90.00 (Comex Stat/MDIC). Preço implícito = Valor FOB (US$) ÷ Peso líquido (t); t = kg ÷ 1.000.</p>
+<div class="box"><div class="cv"><canvas id="c-ex1"></canvas></div></div>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"><div class="box"><div class="cv"><canvas id="c-ex2"></canvas></div></div><div class="box"><div class="cv"><canvas id="c-ex3"></canvas></div></div></div>
+<h3>Tabela anual <span class="note">(linhas em destaque: volume ↑ e receita ↓ no ano)</span></h3><div class="sc" id="tb-ano"></div>
+<h3>Por via de transporte</h3><div class="sc" id="tb-via"></div>
+<div class="row"><button class="btn" id="csvOut">Exportar tabela mensal (CSV)</button></div></section>
+
+<section class="tab" id="t-od"><h2>Oferta, demanda e equilíbrio</h2><p class="sub">Séries mensais Q (t) e P (US$/t) do filtro atual. Mínimos quadrados ordinários (MQO).</p><div id="od-body"></div></section>
+
+<section class="tab" id="t-cl"><h2>Custos, receita e lucro</h2><p class="sub">Modelo didático do PBL: <span class="fm">C(q) = 5.000.000 + 180q + 0,0006q²</span> (US$; q em t). P é o preço <b>líquido</b> por tonelada (FOB menos frete e custos portuários).</p>
+<div class="row"><label>P líquido (US$/t)<input type="range" id="Pr" min="100" max="800" step="1" value="400"></label><label>valor<input type="number" id="Pn" value="400" step="1"></label></div>
+<div class="note">Referência do enunciado: ~US$ 400/t FOB médio (confirmar na fonte). Desconte frete e porto antes de usar aqui.</div>
+<div class="grid" id="cl-k" style="margin-top:10px"></div>
+<div class="box"><div class="cv"><canvas id="c-cl1"></canvas></div></div><div class="box"><div class="cv"><canvas id="c-cl2"></canvas></div></div>
+<div class="box"><b>Derivações</b><ul><li><span class="fm">C′(q)=180+0,0012q</span>; <span class="fm">R′(q)=P</span>; condição de máximo: <span class="fm">P = 180+0,0012q → q* = (P−180)/0,0012</span></li><li><span class="fm">L″(q) = −0,0012 &lt; 0</span> em todo q: a condição de primeira ordem dá um máximo.</li><li><span class="fm">CMe = 5.000.000/q + 180 + 0,0006q</span>; <span class="fm">CMe′ = −5.000.000/q² + 0,0006 = 0 → q = √(5.000.000/0,0006)</span>. Difere de q* porque q* depende de P (CMg = P), enquanto o CMe mínimo é uma propriedade só da tecnologia.</li><li>Oferta: <span class="fm">q(P)=max(0,(P−180)/0,0012)</span>; <span class="fm">dq/dP = 1/0,0012 ≈ 833,33 t por US$</span>.</li><li>Shutdown: mínimo do custo variável médio <span class="fm">CVMe=180+0,0006q</span>, que cresce com q; o mínimo ocorre em q→0, logo P = US$ 180/t.</li></ul></div></section>
+
+<section class="tab" id="t-pr"><h2>Produtividade e eficiência</h2><p class="sub">Conab, Abiove, Anec e IBGE não foram consultados automaticamente. Preencha com valores conferidos nas fontes primárias; os valores iniciais são os do enunciado do PBL (referência a confirmar).</p>
+<div class="row"><label>Sacas de 60 kg/ha<input type="number" id="pSc" value="62.8" step="0.1"></label><label>Área (Mha)<input type="number" id="pAr" value="48.25" step="0.01"></label><label>Preço FOB (US$/t)<input type="number" id="pPr" value="400"></label><label>Deflator (índice, 1,00 = sem ajuste)<input type="number" id="pDf" value="1" step="0.01"></label></div>
+<div class="grid" id="pr-k"></div>
+<div class="warn">Valor exportado por hectare = produtividade × preço FOB. Não é renda do produtor. Para comparar anos, informe o deflator e a fonte do índice (ex.: índice de preços ao consumidor dos EUA, a ser obtido de fonte autorizada, se houver) — aqui nenhum índice é presumido.</div>
+<h3>Produtividade marginal de um insumo <span class="tag h">HIPÓTESE</span></h3><p class="note">Função de produção ilustrativa y(x)=a+bx−cx² (t/ha; x = fertilizante em kg/ha). PMg = b−2cx; PMg=0 em x=b/(2c). Substitua pelos parâmetros calibrados com dados reais.</p>
+<div class="row"><label>a<input type="number" id="fa" value="2.5" step="0.1"></label><label>b<input type="number" id="fb" value="0.012" step="0.001"></label><label>c<input type="number" id="fc" value="0.00002" step="0.00001"></label></div><div class="grid" id="pg-k"></div>
+<h3>PTF</h3><div class="row"><label>Índice de produto<input type="number" id="ip" value="110"></label><label>Índice agregado de insumos<input type="number" id="ii" value="104"></label></div><div class="grid" id="ptf-k"></div></section>
+
+<section class="tab" id="t-lg"><h2>Logística e portos</h2><p class="sub">Modelo de otimização: min Σ cᵢxᵢ, sujeito a Σ xᵢ = D e 0 ≤ xᵢ ≤ capᵢ. Variáveis de decisão: xᵢ = toneladas embarcadas pelo porto i.</p>
+<div class="warn">ANTAQ, ESALQ-LOG e Anec não foram consultadas automaticamente. Os valores abaixo são <b>hipóteses ilustrativas</b> — substitua por dados das fontes autorizadas.</div>
+<div class="sc"><table id="pt"></table></div><div class="row"><label>Demanda D a escoar (t) <span class="tag h">HIPÓTESE</span><input type="number" id="D" value="183333"></label></div>
+<div class="grid" id="lg-k"></div><div class="box"><div class="cv"><canvas id="c-lg"></canvas></div></div></section>
+
+<section class="tab" id="t-sc"><h2>Simulações de cenários</h2><p class="sub">Ative cada stress test. O cenário-base usa a aba Custos (P e q*) e a aba Logística (hipóteses).</p>
+<div class="box"><label style="flex-direction:row;gap:8px"><input type="checkbox" id="sA" checked> A — China reduz 10 Mt/ano as compras</label><div class="row"><label>Redução (Mt/ano)<input type="number" id="aM" value="10"></label></div><p class="note">Usa a demanda estimada na aba Oferta/Demanda; o deslocamento mensal é a redução ÷ 12. Se não houver estimativa, o cálculo não é feito. Diversificação (ex.: Paquistão) exige dados da Comex Stat/Anec que você importar; nada é presumido.</p></div>
+<div class="box"><label style="flex-direction:row;gap:8px"><input type="checkbox" id="sB" checked> B — câmbio R$/US$ cai 15%</label><div class="row"><label>Câmbio base (R$/US$) <span class="tag h">HIP.</span><input type="number" id="bF" value="5" step="0.01"></label><label>Queda (%)<input type="number" id="bD" value="15"></label><label>Custos em R$ (%) <span class="tag h">HIP.</span><input type="number" id="bS" value="60"></label></div><p class="note">Preço FOB em US$ mantido; custos em R$ ficam mais caros em dólares.</p></div>
+<div class="box"><label style="flex-direction:row;gap:8px"><input type="checkbox" id="sC" checked> C — custo logístico de Itaqui sobe 20%</label><div class="row"><label>Aumento (%)<input type="number" id="cD" value="20"></label></div></div>
+<div class="sc" id="sc-tb"></div><div class="box"><div class="cv"><canvas id="c-sc"></canvas></div></div></section>
+
+<section class="tab" id="t-dm"><h2>Dados e metodologia</h2>
+<div class="box"><b>Importar CSV do Comex Stat</b><p class="note">Exporte no site do Comex Stat (exportação, NCM 1201.90.00, 2015–2025, detalhado por mês, país, UF e via). Colunas reconhecidas: Ano, Mês, País, UF, Via, Valor FOB (US$), Peso Líquido (Kg). Separador “;” ou “,”. O arquivo é processado só no seu navegador.</p>
+<div class="row"><input type="file" id="file" accept=".csv,.txt" style="max-width:none"><label>Data da consulta<input type="date" id="dq"></label></div><div id="etl"></div></div>
+<h3>Fontes autorizadas</h3><div class="sc"><table><tr><th>Fonte</th><th class="l">Indicador</th><th class="l">Status neste painel</th></tr>
+<tr><td>Comex Stat / MDIC</td><td class="l">FOB, peso líquido, destino, UF, via</td><td class="l" id="st-cx">Aguardando CSV</td></tr>
+<tr><td>Conab</td><td class="l">Produção, área, produtividade</td><td class="l">Entrada manual (aba Produtividade); não consultada</td></tr>
+<tr><td>Abiove</td><td class="l">Complexo soja</td><td class="l">Não consultada</td></tr>
+<tr><td>Anec</td><td class="l">Embarques e destinos</td><td class="l">Não consultada</td></tr>
+<tr><td>ESALQ-LOG</td><td class="l">Custos de frete</td><td class="l">Entrada manual (hipóteses)</td></tr>
+<tr><td>ANTAQ</td><td class="l">Movimentação portuária</td><td class="l">Entrada manual (hipóteses)</td></tr>
+<tr><td>IBGE</td><td class="l">Matriz insumo-produto, índices</td><td class="l">Não consultada</td></tr></table></div>
+<h3>Pipeline ETL</h3><ol><li>Extrair: CSV exportado do Comex Stat (manual; não há atualização automática).</li><li>Padronizar datas (ano-mês) e unidades.</li><li>kg → t (÷1.000).</li><li>Preço implícito = FOB ÷ t.</li><li>Detectar duplicatas exatas e meses ausentes.</li><li>Validar: soma por UF = soma por país = total.</li><li>Registrar fonte e data da consulta.</li><li>Recalcular indicadores a cada importação.</li></ol>
+<p class="note">Divergência de volumes entre fontes: a Anec trabalha com cronogramas de embarque; o Comex Stat registra declarações de exportação. Os números citados no enunciado (ex.: US$ 43,5 bi, 108,6 Mt) são pontos de partida a confirmar na fonte primária.</p></section>
+
+<section class="tab" id="t-cn"><h2>Conclusão e recomendações</h2><p class="sub">Respostas geradas a partir do que foi importado e calculado. Onde faltam dados, aparece “dado ausente”.</p><div id="cn"></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const nf=(v,d=0)=>v==null||!isFinite(v)?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pc=v=>v==null||!isFinite(v)?"—":nf(v*100,1)+"%";
+const TABS=[["vg","Visão geral"],["ex","Exportações e preços"],["od","Oferta e demanda"],["cl","Custos e lucro"],["pr","Produtividade"],["lg","Logística e portos"],["sc","Cenários"],["dm","Dados e metodologia"],["cn","Conclusão"]];
+TABS.forEach(([k,n])=>{const b=document.createElement("button");b.textContent=n;b.dataset.k=k;b.onclick=()=>show(k);$("#nav").append(b)});
+function show(k){$$(".tab").forEach(t=>t.classList.toggle("on",t.id=="t-"+k));$$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.k==k));render()}
+let rows=[],F={y0:"",y1:"",pais:"",uf:""},CH={};
+function mk(id,type,data,opt={}){if(CH[id])CH[id].destroy();const c=$("#"+id);if(!c)return;const cs=getComputedStyle(document.documentElement);Chart.defaults.color=cs.getPropertyValue("--mu");CH[id]=new Chart(c,{type,data,options:Object.assign({responsive:true,maintainAspectRatio:false,animation:false},opt)})}
+const COL=["#5f8a2f","#14352a","#b8860b","#7a8b84","#3d7ea6","#a05a2c","#8e6bbf","#c2185b"];
+/* ---- CSV ---- */
+function parseCSV(t){const L=t.replace(/^\uFEFF/,"").split(/\r?\n/).filter(x=>x.trim());const sep=(L[0].match(/;/g)||[]).length>=(L[0].match(/,/g)||[]).length?";":",";const sp=l=>{const o=[];let c="",q=0;for(const ch of l){if(ch=='"')q=!q;else if(ch==sep&&!q){o.push(c);c=""}else c+=ch}o.push(c);return o.map(s=>s.trim())};const H=sp(L[0]).map(h=>h.toLowerCase());const f=r=>H.findIndex(h=>r.test(h));const ix={a:f(/^ano/),m:f(/^m[eê]s/),p:f(/pa[ií]s/),u:f(/\buf\b|estado/),v:f(/^via/),f:f(/fob/),k:f(/peso|kg/)};const num=s=>{s=(s||"").replace(/\s/g,"");if(/,\d{1,3}$/.test(s)&&/\./.test(s))s=s.replace(/\./g,"").replace(",",".");else if(/^\d+,\d+$/.test(s))s=s.replace(",",".");return parseFloat(s)};const out=[];let bad=0;for(const l of L.slice(1)){const c=sp(l);const mes=ix.m>=0?parseInt(c[ix.m]):0;const o={a:parseInt(c[ix.a]),m:isNaN(mes)?0:mes,p:c[ix.p]||"(n/d)",u:c[ix.u]||"(n/d)",v:c[ix.v]||"(n/d)",fob:num(c[ix.f]),kg:num(c[ix.k])};if(isNaN(o.a)||isNaN(o.fob)||isNaN(o.kg))bad++;else out.push(o)}return{out,bad,ix}}
+$("#file").onchange=async e=>{const f=e.target.files[0];if(!f)return;const r=parseCSV(await f.text());if(r.ix.f<0||r.ix.k<0||r.ix.a<0){$("#etl").innerHTML='<div class="warn">Colunas de Ano, Valor FOB e Peso Líquido não encontradas.</div>';return}
+const seen=new Set();let dup=0;rows=r.out.filter(o=>{const k=JSON.stringify(o);if(seen.has(k)){dup++;return false}seen.add(k);return true});
+const yrs=[...new Set(rows.map(o=>o.a))].sort();const miss=[];yrs.forEach(y=>{if(r.ix.m>=0){const ms=new Set(rows.filter(o=>o.a==y).map(o=>o.m));for(let m=1;m<=12;m++)if(!ms.has(m))miss.push(y+"-"+String(m).padStart(2,"0"))}});
+const tot=rows.reduce((s,o)=>s+o.kg,0),tu=sumBy(rows,"u"),tp=sumBy(rows,"p");const ok=Math.abs(tu-tot)<1&&Math.abs(tp-tot)<1;
+window.ETL={n:rows.length,bad:r.bad,dup,miss,yrs,ok,file:f.name,dq:$("#dq").value||"não informada"};
+$("#etl").innerHTML=`<div class="sc"><table><tr><th>Fonte</th><th>Período</th><th>Consulta</th><th>Linhas</th><th>Inválidas</th><th>Duplicadas removidas</th><th>Meses ausentes</th><th>Validação</th></tr><tr><td>Comex Stat (${f.name})</td><td>${yrs[0]}–${yrs[yrs.length-1]}</td><td>${ETL.dq}</td><td>${rows.length}</td><td>${r.bad}</td><td>${dup}</td><td>${miss.length}</td><td>${ok?"Somas por UF e país batem com o total":"Divergência nas somas"}</td></tr></table></div>${miss.length?`<div class="warn">Meses ausentes: ${miss.slice(0,24).join(", ")}${miss.length>24?"…":""}</div>`:""}`;
+$("#st-cx").textContent="Importado ("+rows.length+" linhas, consulta: "+ETL.dq+")";initFilters();render()};
+const sumBy=(a,k)=>{const m={};a.forEach(o=>m[o[k]]=(m[o[k]]||0)+o.kg);return Object.values(m).reduce((s,v)=>s+v,0)};
+/* ---- filters/aggregation ---- */
+function initFilters(){const ys=[...new Set(rows.map(o=>o.a))].sort(),ps=[...new Set(rows.map(o=>o.p))].sort(),us=[...new Set(rows.map(o=>o.u))].sort();const sel=(id,l,arr)=>`<label>${l}<select id="${id}"><option value="">Todos</option>${arr.map(x=>`<option>${x}</option>`).join("")}</select></label>`;$("#flt").innerHTML=sel("fy0","Ano inicial",ys)+sel("fy1","Ano final",ys)+sel("fp","País",ps)+sel("fu","Estado",us)+'<span class="note">Filtro por porto: depende de dados da ANTAQ (não importados).</span>';["fy0","fy1","fp","fu"].forEach(i=>$("#"+i).onchange=()=>{F.y0=$("#fy0").value;F.y1=$("#fy1").value;F.pais=$("#fp").value;F.uf=$("#fu").value;render()})}
+const fr=()=>rows.filter(o=>(!F.y0||o.a>=+F.y0)&&(!F.y1||o.a<=+F.y1)&&(!F.pais||o.p==F.pais)&&(!F.uf||o.u==F.uf));
+function grp(a,kf){const m={};a.forEach(o=>{const k=kf(o);(m[k]=m[k]||{kg:0,fob:0});m[k].kg+=o.kg;m[k].fob+=o.fob});return Object.entries(m).map(([k,v])=>({k,t:v.kg/1000,fob:v.fob,p:v.fob/(v.kg/1000)}))}
+const yearly=()=>grp(fr(),o=>o.a).sort((a,b)=>a.k-b.k);
+const monthly=()=>grp(fr().filter(o=>o.m>0),o=>o.a+"-"+String(o.m).padStart(2,"0")).sort((a,b)=>a.k<b.k?-1:1);
+const nodata='<div class="warn">Sem dados: importe o CSV do Comex Stat na aba “Dados e metodologia”. Nenhum valor é inventado.</div>';
+/* ---- cost model ---- */
+const C=q=>5e6+180*q+6e-4*q*q,qs=P=>Math.max(0,(P-180)/0.0012),Pnet=()=>+$("#Pn").value;
+const qCMe=Math.sqrt(5e6/6e-4),CMeMin=5e6/qCMe+180+6e-4*qCMe;
+function model(P){const q=qs(P);return{q,R:P*q,C:C(q),L:P*q-C(q)}}
+/* ---- OLS ---- */
+function ols(x,y){const n=x.length;if(n<3)return null;const mx=x.reduce((s,v)=>s+v,0)/n,my=y.reduce((s,v)=>s+v,0)/n;let sxy=0,sxx=0,syy=0;for(let i=0;i<n;i++){sxy+=(x[i]-mx)*(y[i]-my);sxx+=(x[i]-mx)**2;syy+=(y[i]-my)**2}if(!sxx)return null;const b=sxy/sxx,a=my-b*mx,ssr=y.reduce((s,v,i)=>s+(v-a-b*x[i])**2,0);return{a,b,r2:syy?1-ssr/syy:NaN,n,rmse:Math.sqrt(ssr/n)}}
+function fits(){const m=monthly();if(m.length<6)return null;const P=m.map(o=>o.p),Q=m.map(o=>o.t);const d=ols(P,Q);const s=ols(P.slice(0,-1),Q.slice(1));if(!d||!s)return{d,s,m};let eq=null;if(Math.abs(s.b-d.b)>1e-9){const p=(d.a-s.a)/(s.b-d.b);eq={p,q:d.a+d.b*p}}return{d,s,eq,m}}
+/* ---- logistics ---- */
+let PORTS=[{n:"Itaqui (MA)",cap:120000,c:42,v:60000,d:300},{n:"Barcarena (PA)",cap:90000,c:48,v:40000,d:300},{n:"Santos (SP)",cap:150000,c:70,v:90000,d:330},{n:"Paranaguá (PR)",cap:100000,c:66,v:50000,d:330}];
+function alloc(D,ports){const o=ports.map((p,i)=>({i,p})).sort((a,b)=>a.p.c-b.p.c);let r=D;const x=ports.map(()=>0);o.forEach(({i,p})=>{const t=Math.min(r,p.cap);x[i]=t;r-=t});return{x,cost:x.reduce((s,v,i)=>s+v*ports[i].c,0),short:r}}
+function drawPorts(){const t=$("#pt");if(!t.dataset.b){t.innerHTML='<tr><th>Porto</th><th>Capacidade (t/ano)</th><th>Custo (US$/t)</th><th>Volume embarcado (t)</th><th>Dias de operação</th></tr>'+PORTS.map((p,i)=>`<tr><td>${p.n}</td>${["cap","c","v","d"].map(k=>`<td><input type="number" data-i="${i}" data-k="${k}" value="${p[k]}"></td>`).join("")}</tr>`).join("");t.dataset.b=1;t.oninput=e=>{PORTS[e.target.dataset.i][e.target.dataset.k]=+e.target.value;render()}}}
+/* ---- render ---- */
+function k(l,v,u,t){return`<div class="k ${t=="c"?"calc":t=="h"?"hyp":""}"><span>${l} <span class="tag ${t||""}">${t=="c"?"CÁLCULO":t=="h"?"HIPÓTESE":"DADO"}</span></span><b>${v}</b><span>${u}</span></div>`}
+function render(){const on=$(".tab.on");if(!on)return;({vg:rVG,ex:rEX,od:rOD,cl:rCL,pr:rPR,lg:rLG,sc:rSC,cn:rCN}[on.id.slice(2)]||(()=>{}))()}
+function rVG(){const Y=yearly();const m=model(Pnet());let h="";const last=Y[Y.length-1],prev=Y[Y.length-2];
+if(!Y.length)h=nodata;else{const ch=fr();const chn=ch.filter(o=>o.a==last.k&&/china/i.test(o.p)).reduce((s,o)=>s+o.kg,0)/1000;h=k("Volume "+last.k,nf(last.t/1e6,2)+" Mt","toneladas ÷ 10⁶")+k("Valor FOB "+last.k,"US$ "+nf(last.fob/1e9,2)+" bi","US$")+k("Preço implícito",nf(last.p,0),"US$/t","c")+(prev?k("Var. volume",pc(last.t/prev.t-1),"a/a","c")+k("Var. receita",pc(last.fob/prev.fob-1),"a/a","c"):"")+k("Participação China",F.pais?"filtro ativo":pc(chn/last.t),"do volume (se país “China” existir)","c")}
+h+=k("Produtividade (ref.)",nf(+$("#pSc").value*0.06,3),"t/ha — enunciado, a confirmar","h")+k("Lucro estimado",
+"US$ "+nf(m.L/1e6,2)+" mi","modelo, P líquido="+nf(Pnet())+" US$/t","c")+k("Quantidade ótima",nf(m.q,0),"t (modelo)","c");$("#kpi").innerHTML=h;
+if(!Y.length)return;const lb=Y.map(y=>y.k);mk("c-vg1","bar",{labels:lb,datasets:[{type:"bar",label:"Volume (Mt)",data:Y.map(y=>y.t/1e6),backgroundColor:COL[0],yAxisID:"y"},{type:"line",label:"Receita FOB (US$ bi)",data:Y.map(y=>y.fob/1e9),borderColor:COL[2],yAxisID:"y1"}]},{scales:{y:{title:{display:true,text:"Mt"}},y1:{position:"right",grid:{drawOnChartArea:false},title:{display:true,text:"US$ bi"}}}});
+mk("c-vg2","line",{labels:lb,datasets:[{label:"Preço implícito (US$/t)",data:Y.map(y=>y.p),borderColor:COL[1]}]});
+const P=grp(fr(),o=>o.p).sort((a,b)=>b.t-a.t).slice(0,8);mk("c-vg3","bar",{labels:P.map(x=>x.k),datasets:[{label:"Top destinos (Mt)",data:P.map(x=>x.t/1e6),backgroundColor:COL[0]}]},{indexAxis:"y"})}
+function tbl(h,r){return'<table><tr>'+h.map(x=>`<th>${x}</th>`).join("")+"</tr>"+r.map(x=>`<tr class="${x.hi?"hi":""}">`+x.c.map(c=>`<td>${c}</td>`).join("")+"</tr>").join("")+"</table>"}
+function rEX(){const Y=yearly();if(!Y.length){$("#tb-ano").innerHTML=nodata;$("#tb-via").innerHTML="";return}
+$("#tb-ano").innerHTML=tbl(["Ano","Volume (t)","FOB (US$)","Preço (US$/t)","Δ volume","Δ receita"],Y.map((y,i)=>{const p=Y[i-1];const dv=p?y.t/p.t-1:null,dr=p?y.fob/p.fob-1:null;return{hi:p&&dv>0&&dr<0,c:[y.k,nf(y.t),nf(y.fob),nf(y.p,2),pc(dv),pc(dr)]}}));
+$("#tb-via").innerHTML=tbl(["Via","Volume (t)","FOB (US$)","Preço (US$/t)"],grp(fr(),o=>o.v).sort((a,b)=>b.t-a.t).map(x=>({c:[x.k,nf(x.t),nf(x.fob),nf(x.p,2)]})));
+const M=monthly();if(M.length)mk("c-ex1","line",{labels:M.map(x=>x.k),datasets:[{label:"Volume mensal (Mt)",data:M.map(x=>x.t/1e6),borderColor:COL[0],pointRadius:0},{label:"Preço (US$/t)",data:M.map(x=>x.p),borderColor:COL[2],pointRadius:0,yAxisID:"y1"}]},{scales:{y1:{position:"right",grid:{drawOnChartArea:false}}}});
+const U=grp(fr(),o=>o.u).sort((a,b)=>b.t-a.t).slice(0,10);mk("c-ex2","bar",{labels:U.map(x=>x.k),datasets:[{label:"Por estado (Mt)",data:U.map(x=>x.t/1e6),backgroundColor:COL[1]}]});
+mk("c-ex3","scatter",{datasets:[{label:"Volume (Mt) × receita (US$ bi) por ano",data:Y.map(y=>({x:y.t/1e6,y:y.fob/1e9})),backgroundColor:COL[0]}]},{scales:{x:{title:{display:true,text:"Mt"}},y:{title:{display:true,text:"US$ bi"}}}})}
+$("#csvOut").onclick=()=>{const M=monthly();if(!M.length)return alert("Sem dados para exportar.");const s="periodo;toneladas;fob_usd;preco_usd_t\n"+M.map(x=>[x.k,x.t,x.fob,x.p.toFixed(2)].join(";")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([s],{type:"text/csv"}));a.download="soja_mensal.csv";a.click()};
+function rOD(){const f=fits();const b=$("#od-body");if(!f){b.innerHTML=nodata;return}const{d,s,eq,m}=f;
+const eqn=(x,n)=>x?`<span class="fm">Q = ${nf(x.a,0)} ${x.b<0?"−":"+"} ${nf(Math.abs(x.b),1)}·P</span> &nbsp; R²=${nf(x.r2,3)} · RMSE=${nf(x.rmse,0)} t · n=${x.n}`:"";
+b.innerHTML=`<div class="box"><b>Demanda estimada</b> <span class="tag c">CÁLCULO</span><br>${eqn(d)}<br><b>Oferta estimada</b> <span class="tag h">HIPÓTESE ESTATÍSTICA</span> (Q do mês t sobre P do mês t−1)<br>${eqn(s)}</div>
+${d.b>=0?'<div class="warn">A inclinação da demanda saiu não negativa: os dados não identificam uma demanda decrescente. Não interprete como curva de demanda.</div>':""}
+<div class="box"><b>Equilíbrio:</b> ${eq&&eq.p>0&&eq.q>0?`P* = US$ ${nf(eq.p,2)}/t · Q* = ${nf(eq.q,0)} t/mês`:"não existe interseção com sentido econômico (P*, Q* positivos) com estes dados."}</div>
+<div class="box"><div class="cv"><canvas id="c-od"></canvas></div></div>
+<div class="box"><b>Simulador</b><div class="row"><label>Preço simulado (US$/t)<input type="number" id="sp" value="${nf(m[m.length-1].p,0).replace(/\./g,"")}"></label></div><div id="sim"></div></div>
+<div class="warn">Limitações: exportações observadas são pontos de equilíbrio (preço e quantidade determinados juntos), não curvas de demanda ou oferta. MQO com um só regressor sofre de simultaneidade; o uso de P defasado como proxy da oferta é uma hipótese. Séries de preço e quantidade têm sazonalidade e tendência não tratadas. Compare a ordem de grandeza da oferta de mercado com a soma de ofertas individuais q(P) da aba Custos.</div>`;
+const xs=m.map(o=>o.p),x0=Math.min(...xs),x1=Math.max(...xs);mk("c-od","scatter",{datasets:[{label:"Observado",data:m.map(o=>({x:o.p,y:o.t})),backgroundColor:"#7a8b8466"},{type:"line",label:"Demanda",data:[{x:x0,y:d.a+d.b*x0},{x:x1,y:d.a+d.b*x1}],borderColor:COL[3]},{type:"line",label:"Oferta (hip.)",data:[{x:x0,y:s.a+s.b*x0},{x:x1,y:s.a+s.b*x1}],borderColor:COL[0]}]},{scales:{x:{title:{display:true,text:"US$/t"}},y:{title:{display:true,text:"t/mês"}}}});
+const up=()=>{const p=+$("#sp").value,qd=d.a+d.b*p,qo=s.a+s.b*p;$("#sim").innerHTML=`Demanda: ${nf(qd,0)} t/mês · Oferta: ${nf(qo,0)} t/mês · ${qo>qd?"excesso de oferta":"excesso de demanda"} de ${nf(Math.abs(qo-qd),0)} t/mês <span class="tag c">CÁLCULO</span>`};$("#sp").oninput=up;up()}
+function rCL(){const P=Pnet(),m=model(P),CV=180*m.q+6e-4*m.q**2;
+$("#cl-k").innerHTML=k("Custo fixo","US$ 5.000.000","","c")+k("Custo variável total","US$ "+nf(CV),"","c")+k("Custo total C(q*)","US$ "+nf(m.C),"","c")+k("Custo marginal",nf(180+0.0012*m.q,2),"US$/t","c")+k("Custo médio",nf(m.q?m.C/m.q:NaN,2),"US$/t","c")+k("Receita total","US$ "+nf(m.R),"","c")+k("Receita marginal",nf(P,2),"US$/t","c")+k("Lucro / (prejuízo)","US$ "+nf(m.L),"","c")+k("q* (máx. lucro)",nf(m.q),"t","c")+k("q de CMe mínimo",nf(qCMe),"t","c")+k("CMe mínimo",nf(CMeMin,2),"US$/t","c")+k("Shutdown point","US$ 180,00","US$/t (min CVMe)","c")+k("dq/dP",nf(1/0.0012,2),"t por US$","c");
+const mx=Math.max(2*m.q,250000),N=40,qq=[...Array(N+1)].map((_,i)=>Math.round(i*mx/N));
+mk("c-cl1","line",{labels:qq,datasets:[{label:"Custo total (US$)",data:qq.map(C),borderColor:COL[2],pointRadius:0},{label:"Receita (US$)",data:qq.map(q=>P*q),borderColor:COL[0],pointRadius:0},{label:"Lucro (US$)",data:qq.map(q=>P*q-C(q)),borderColor:COL[1],pointRadius:0}]},{scales:{x:{title:{display:true,text:"q (t)"}}}});
+const q2=qq.slice(1);mk("c-cl2","line",{labels:q2,datasets:[{label:"CMg",data:q2.map(q=>180+0.0012*q),borderColor:COL[2],pointRadius:0},{label:"CMe",data:q2.map(q=>C(q)/q),borderColor:COL[1],pointRadius:0},{label:"P",data:q2.map(()=>P),borderColor:COL[0],pointRadius:0,borderDash:[5,4]}]},{scales:{y:{title:{display:true,text:"US$/t"}},x:{title:{display:true,text:"q (t)"}}}})}
+$("#Pr").oninput=e=>{$("#Pn").value=e.target.value;render()};$("#Pn").oninput=e=>{$("#Pr").value=e.target.value;render()};
+function rPR(){const sc=+$("#pSc").value,ha=+$("#pAr").value*1e6,pr=+$("#pPr").value,df=+$("#pDf").value||1,th=sc*0.06;
+$("#pr-k").innerHTML=k("Produtividade",nf(th,3),"t/ha = sacas × 0,06","c")+k("Produtividade",nf(sc,1),"sacas de 60 kg/ha","h")+k("Produção implícita",nf(th*ha/1e6,1)+" Mt","produtividade × área","c")+k("Valor exportado/ha",nf(th*pr,0),"US$/ha (nominal)","c")+k("Valor/ha deflacionado",nf(th*pr/df,0),"US$/ha constantes","c");
+const a=+$("#fa").value,b=+$("#fb").value,c=+$("#fc").value,xo=c?b/(2*c):NaN;$("#pg-k").innerHTML=k("Ponto PMg=0",nf(xo,0),"kg/ha do insumo","h")+k("y no ponto",nf(a+b*xo-c*xo*xo,3),"t/ha","h");
+const ptf=(+$("#ip").value)/(+$("#ii").value);$("#ptf-k").innerHTML=k("PTF",nf(ptf,3),"produto ÷ insumos (índices)","c")}
+function rLG(){drawPorts();const D=+$("#D").value,r=alloc(D,PORTS),tot=PORTS.reduce((s,p)=>s+p.v,0);
+$("#lg-k").innerHTML=k("Custo logístico ótimo","US$ "+nf(r.cost),"Σ cᵢxᵢ","c")+k("Custo médio",nf(D?r.cost/(D-r.short):NaN,2),"US$/t","c")+(r.short>0?k("Capacidade insuficiente",nf(r.short),"t sem alocação","h"):"")+PORTS.map((p,i)=>k(p.n,nf(r.x[i]),"t alocadas · "+pc(D?r.x[i]/D:0)+" · "+nf(p.v/p.d,0)+" t/dia obs. · ocupação "+pc(p.v/p.cap),"c")).join("");
+mk("c-lg","bar",{labels:PORTS.map(p=>p.n),datasets:[{label:"Embarcado atual (t)",data:PORTS.map(p=>p.v),backgroundColor:COL[3]},{label:"Alocação ótima (t)",data:r.x,backgroundColor:COL[0]}]})}
+function rSC(){const P=Pnet(),m=model(P),f=fits(),base=alloc(m.q,PORTS),R=[];const add=(i,b,s,u,t)=>R.push([i,nf(b,2),nf(s,2),nf(s-b,2),b?pc(s/b-1):"—",t]);
+if($("#sA").checked){if(f&&f.d&&f.eq){const sh=+$("#aM").value*1e6/12,a2=f.d.a-sh,p2=(a2-f.s.a)/(f.s.b-f.d.b),q2=a2+f.d.b*p2;add("A: Preço de equilíbrio (US$/t)",f.eq.p,p2,"","Pressão sobre preço se a demanda cai e a oferta não se ajusta.");add("A: Quantidade de equilíbrio (t/mês)",f.eq.q,q2,"","Volume de mercado.");add("A: Receita de equilíbrio (US$/mês)",f.eq.p*f.eq.q,p2*q2*1,"","Receita agregada do mercado modelado.");const m2=model(P+(p2-f.eq.p));add("A: Lucro da cooperativa (US$)",m.L,m2.L,"","Assume repasse integral da variação de preço ao P líquido.")}else R.push(["A: sem estimativa de demanda/equilíbrio","—","—","—","—","Dado ausente: importe o CSV."])}
+if($("#sB").checked){const F0=+$("#bF").value,F1=F0*(1-(+$("#bD").value)/100),s=(+$("#bS").value)/100,cB=s*m.C,cU=m.C-cB,LB=F0*(m.R-cU)-cB*F0,L1=F1*(m.R-cU)-cB*F0;add("B: Receita (R$)",m.R*F0,m.R*F1,"","FOB em US$ mantido; receita em R$ cai com o câmbio.");add("B: Lucro (R$)",LB,L1,"","Custos em R$ não caem com o câmbio.")}
+if($("#sC").checked){const p2=PORTS.map((p,i)=>i==0?{...p,c:p.c*(1+(+$("#cD").value)/100)}:p),r2=alloc(m.q,p2);add("C: Custo logístico total (US$)",base.cost,r2.cost,"","Alocação reotimizada.");add("C: Toneladas por Itaqui",base.x[0],r2.x[0],"","Redistribuição entre portos.");add("C: Lucro (US$)",m.L,m.L-(r2.cost-base.cost),"","Base já líquida do custo logístico-base.")}
+$("#sc-tb").innerHTML=R.length?'<table><tr><th>Indicador</th><th>Base</th><th>Simulado</th><th>Dif. absoluta</th><th>Var. %</th><th class="l">Interpretação</th></tr>'+R.map(r=>"<tr>"+r.map((c,i)=>`<td class="${i==5?"l":""}">${c}</td>`).join("")+"</tr>").join("")+"</table>":"";
+const pr=R.filter(r=>r[4]!="—");mk("c-sc","bar",{labels:pr.map(r=>r[0].slice(0,26)),datasets:[{label:"Variação % (base→simulado)",data:pr.map(r=>parseFloat(r[4].replace(",","."))),backgroundColor:COL[2]}]},{indexAxis:"y"})}
+function rCN(){const Y=yearly(),f=fits(),m=model(Pnet()),D=+$("#D").value,r=alloc(m.q,PORTS);const a=Y.length?Y[0]:null,z=Y[Y.length-1];
+const Q=[["Evolução das exportações",a?`${a.k}: ${nf(a.t/1e6,1)} Mt → ${z.k}: ${nf(z.t/1e6,1)} Mt.`:"dado ausente"],["Preço, volume e receita",a?`Preço ${nf(a.p,0)} → ${nf(z.p,0)} US$/t; FOB US$ ${nf(a.fob/1e9,1)} → ${nf(z.fob/1e9,1)} bi. Anos com volume ↑ e receita ↓ estão destacados na aba Exportações.`:"dado ausente"],["Oferta e demanda",f&&f.d?`Demanda: Q=${nf(f.d.a,0)}${f.d.b<0?"−":"+"}${nf(Math.abs(f.d.b),1)}P (R²=${nf(f.d.r2,2)}). Oferta (hip.): Q=${nf(f.s.a,0)}${f.s.b<0?"−":"+"}${nf(Math.abs(f.s.b),1)}P (R²=${nf(f.s.r2,2)}).`:"dado ausente"],["Quantidade que maximiza o lucro",`q* = ${nf(m.q)} t com P líquido = US$ ${nf(Pnet())}/t (lucro US$ ${nf(m.L)}).`],["Custo médio mínimo",`US$ ${nf(CMeMin,2)}/t em q = ${nf(qCMe)} t.`],["Shutdown point","P = US$ 180/t (mínimo do custo variável médio)."],["Produtividade","Com os valores da aba Produtividade: "+nf(+$("#pSc").value*0.06,3)+" t/ha. Comparação anual com a Conab: dado ausente até que seja informado."],["Distribuição ótima entre portos",`Custo ótimo US$ ${nf(r.cost)} para q* (hipóteses de custo/capacidade). Alocação: ${PORTS.map((p,i)=>p.n+" "+nf(r.x[i])+" t").join("; ")}.`],["Cenários","Veja a aba Cenários; resultados dependem das hipóteses assinaladas."],["Melhor estratégia","Entre os cenários calculados, a decisão de menor risco é a que mantém q ≤ q* e realoca embarques conforme o custo de cada porto; confirme com dados reais das fontes antes de recomendar."]];
+$("#cn").innerHTML=Q.map((q,i)=>`<div class="box"><b>${i+1}. ${q[0]}</b><br>${q[1]}</div>`).join("")}
+show("vg");
+</script></body></html>
