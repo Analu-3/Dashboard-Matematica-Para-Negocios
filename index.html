@@ -83,7 +83,7 @@ input[type=range]{max-width:none;width:260px}
 <section class="tab" id="t-dm"><h2>Dados e metodologia</h2>
 <div class="box"><b>Importar CSV do Comex Stat</b><p class="note">Exporte no site do Comex Stat (exportação, NCM 1201.90.00, 2015–2025, detalhado por mês, país, UF e via). Colunas reconhecidas: Ano, Mês, País, UF, Via, Valor FOB (US$), Peso Líquido (Kg). Separador “;” ou “,”. O arquivo é processado só no seu navegador.</p>
 <div class="row"><input type="file" id="file" accept=".csv,.txt" style="max-width:none"><label>Data da consulta<input type="date" id="dq"></label></div><div id="etl"></div></div>
-<h3>Fontes autorizadas</h3><div class="sc"><table><tr><th>Fonte</th><th class="l">Arquivo / indicador</th><th>Período</th><th>Consulta</th><th class="l">Status</th></tr>
+<h3>Baixar os dados embutidos (CSV)</h3><div class="row"><button class="btn" data-d="comex">Comex Stat — China</button><button class="btn" data-d="abd">Abiove — destinos</button><button class="btn" data-d="abp">Abiove — portos</button><button class="btn" data-d="anec">Anec — portos 2015–2019</button><button class="btn" data-d="conab">Conab</button></div><p class="note">Todos os dados deste painel estão dentro deste arquivo HTML; nada é buscado na internet (só a biblioteca de gráficos e a fonte). Separador “;”.</p><h3>Fontes autorizadas</h3><div class="sc"><table><tr><th>Fonte</th><th class="l">Arquivo / indicador</th><th>Período</th><th>Consulta</th><th class="l">Status</th></tr>
 <tr><td>Comex Stat/MDIC</td><td class="l">3 planilhas H_EXPORTACAO_GERAL, NCM 12019000, só China</td><td>2015–2025</td><td>26/10/2026</td><td class="l">Validado; 2023 duplicado entre arquivos, contado uma vez</td></tr>
 <tr><td>Abiove (ComexStat)</td><td class="l">exp_202609: grão por destino e por porto, preço mensal</td><td>2022–set/2026</td><td>dados até 09/2026</td><td class="l">Usado; antes de 2022 dado ausente</td></tr>
 <tr><td>Conab</td><td class="l">Previsão de safra out/2026 (soja) e suprimento</td><td>2020/21–2026/27</td><td>out/2026</td><td class="l">Área e produtividade só 25/26 e 26/27</td></tr>
@@ -255,6 +255,15 @@ const Q=[["Evolução das exportações",`China (MDIC): ${nf(a.t/1e6,1)} Mt em $
 ["Melhor estratégia entre os cenários",`Entre os calculados, o menor dano vem de C: realocar embarques custa US$ ${nf(dC)} (${pc(-dC/m.L)} do lucro), enquanto B reduz o lucro em R$ em ${pc(L1/LB-1)} e A depende de uma demanda mal ajustada. Estratégia coerente com o enunciado: reduzir a dependência da China (${pc(shr(3))} em 2025) com contratos fora dela e manter o escoamento pelo porto de menor custo líquido. As conclusões numéricas de B e C usam hipóteses marcadas como tal.`]];
 $("#cn").innerHTML=Q.map((q,i)=>`<div class="box"><b>${i+1}. ${q[0]}</b><br>${q[1]}</div>`).join("")};
 function sumAN(y){return AN[y]["TOTAL MENSAL"].slice(0,12).reduce((a,b)=>a+b,0)}
+
+
+function dl(name,head,rs){const s=[head,...rs].map(r=>Array.isArray(r)?r.join(";"):r).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\uFEFF"+s],{type:"text/csv;charset=utf-8"}));a.download=name;a.click()}
+const DL={comex:()=>dl("comex_soja_china_2015_2025.csv","ano;mes;uf;via;kg_liquido;valor_fob_usd;toneladas;preco_usd_t",rows.map(o=>[o.a,o.m,o.u,o.v,o.kg,o.fob,o.kg/1000,(o.kg?o.fob/(o.kg/1000):"").toString().replace(".",",")])),
+abd:()=>dl("abiove_soja_graos_destinos.csv","tipo;destino;2022;2023;2024;2025;2026_jan_set",[...Object.entries(AB.tD).map(([n,v])=>["toneladas",n,...v]),...Object.entries(AB.fD).map(([n,v])=>["usd_mil",n,...v])]),
+abp:()=>dl("abiove_soja_graos_portos.csv","tipo;porto;2022;2023;2024;2025;2026_jan_set",[...Object.entries(AB.tP).map(([n,v])=>["toneladas",n,...v]),...Object.entries(AB.fP).map(([n,v])=>["usd_mil",n,...v])]),
+anec:()=>dl("anec_soja_portos_2015_2019.csv","ano;porto;jan;fev;mar;abr;mai;jun;jul;ago;set;out;nov;dez;total_pdf",Object.entries(AN).flatMap(([y,d])=>Object.entries(d).map(([p,v])=>[y,p,...v]))),
+conab:()=>dl("conab_soja.csv","tabela;item;v1;v2;v3;v4;v5;v6;v7",[...CB.ys.map((y,i)=>["suprimento_mil_t",y,CB.prod[i],CB.exp[i],CB.proc[i],CB.est[i]]),...Object.entries(CB.uf).map(([n,v])=>["uf_area_prod_25_26_26_27",n,...v])])};
+$$("[data-d]").forEach(b=>b.onclick=()=>DL[b.dataset.d]());
 
 show("vg");
 </script></body></html>
