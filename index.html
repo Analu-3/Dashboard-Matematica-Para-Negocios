@@ -80,27 +80,16 @@ input[type=range]{max-width:none;width:260px}
 <div class="box"><label style="flex-direction:row;gap:8px"><input type="checkbox" id="sC" checked> C — custo logístico de Itaqui sobe 20%</label><div class="row"><label>Aumento (%)<input type="number" id="cD" value="20"></label></div></div>
 <div class="sc" id="sc-tb"></div><div class="box"><div class="cv"><canvas id="c-sc"></canvas></div></div></section>
 
-<section class="tab" id="t-dm"><h2>Dados e metodologia</h2>
-<div class="box"><b>Importar CSV do Comex Stat</b><p class="note">Exporte no site do Comex Stat (exportação, NCM 1201.90.00, 2015–2025, detalhado por mês, país, UF e via). Colunas reconhecidas: Ano, Mês, País, UF, Via, Valor FOB (US$), Peso Líquido (Kg). Separador “;” ou “,”. O arquivo é processado só no seu navegador.</p>
-<div class="row"><input type="file" id="file" accept=".csv,.txt" style="max-width:none"><label>Data da consulta<input type="date" id="dq"></label></div><div id="etl"></div></div>
-<h3>Baixar os dados embutidos (CSV)</h3><div class="row"><button class="btn" data-d="comex">Comex Stat — China</button><button class="btn" data-d="abd">Abiove — destinos</button><button class="btn" data-d="abp">Abiove — portos</button><button class="btn" data-d="anec">Anec — portos 2015–2019</button><button class="btn" data-d="conab">Conab</button></div><p class="note">Todos os dados deste painel estão dentro deste arquivo HTML; nada é buscado na internet (só a biblioteca de gráficos e a fonte). Separador “;”.</p><h3>Fontes autorizadas</h3><div class="sc"><table><tr><th>Fonte</th><th class="l">Arquivo / indicador</th><th>Período</th><th>Consulta</th><th class="l">Status</th></tr>
-<tr><td>Comex Stat/MDIC</td><td class="l">3 planilhas H_EXPORTACAO_GERAL, NCM 12019000, só China</td><td>2015–2025</td><td>26/10/2026</td><td class="l">Validado; 2023 duplicado entre arquivos, contado uma vez</td></tr>
-<tr><td>Abiove (ComexStat)</td><td class="l">exp_202609: grão por destino e por porto, preço mensal</td><td>2022–set/2026</td><td>dados até 09/2026</td><td class="l">Usado; antes de 2022 dado ausente</td></tr>
-<tr><td>Conab</td><td class="l">Previsão de safra out/2026 (soja) e suprimento</td><td>2020/21–2026/27</td><td>out/2026</td><td class="l">Área e produtividade só 25/26 e 26/27</td></tr>
-<tr><td>Anec</td><td class="l">PDFs: embarques de soja por porto</td><td>2015–2019</td><td>n/d</td><td class="l">Usado; 2020–2025 dado ausente</td></tr>
-<tr><td>ANTAQ</td><td class="l">4 tabelas de carga bruta sem filtros descritos</td><td>jan–fev/2025 (inferido)</td><td>n/d</td><td class="l">Parcial; sem capacidade, tempo de atracação ou ocupação</td></tr>
-<tr><td>IBGE</td><td class="l">IPCA set/2026 (mensal, no ano, pesos)</td><td>set/2026</td><td>n/d</td><td class="l">Não serve para deflacionar 2015–2025</td></tr>
-<tr><td>ESALQ-LOG</td><td class="l">não enviada</td><td>—</td><td>—</td><td class="l">Custos de frete são hipóteses</td></tr></table></div>
-<h3>Pipeline ETL</h3><ol><li>Extrair: CSV exportado do Comex Stat (manual; não há atualização automática).</li><li>Padronizar datas (ano-mês) e unidades.</li><li>kg → t (÷1.000).</li><li>Preço implícito = FOB ÷ t.</li><li>Detectar duplicatas exatas e meses ausentes.</li><li>Validar: soma por UF = soma por país = total.</li><li>Registrar fonte e data da consulta.</li><li>Recalcular indicadores a cada importação.</li></ol>
-<p class="note">Divergência de volumes entre fontes: a Anec trabalha com cronogramas de embarque; o Comex Stat registra declarações de exportação. Os números citados no enunciado (ex.: US$ 43,5 bi, 108,6 Mt) são pontos de partida a confirmar na fonte primária.</p></section>
+<div hidden><input type="file" id="file"><input type="date" id="dq"><div id="etl"></div><span id="st-cx"></span></div>
 
 <section class="tab" id="t-cn"><h2>Conclusão e recomendações</h2><p class="sub">Respostas geradas a partir do que foi importado e calculado. Onde faltam dados, aparece “dado ausente”.</p><div id="cn"></div></section>
+<footer class="box note" style="margin-top:28px"><b>Fontes e limitações.</b> Comex Stat/MDIC: soja em grão (NCM 1201.90.00), só destino China, 2015–2025, consulta em 26/10/2026 (2023 estava duplicado entre planilhas e foi contado uma vez). Abiove: total do Brasil por destino e porto, 2022–set/2026. Conab: safra 2025/26 e 2026/27 e suprimento 2020/21–2026/27, levantamento de out/2026. Anec: embarques por porto, 2015–2019. ANTAQ: carga bruta por porto, jan–fev/2025 (inferido, filtros não descritos). IBGE: IPCA de set/2026. ESALQ-LOG não foi usada: custos de frete, capacidades e dias de operação dos portos são hipóteses. Série histórica de área e produtividade, ocupação de berço e deflator de 2015–2025: dado ausente. Os dados estão embutidos neste arquivo e não são atualizados automaticamente.</footer>
 </main>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const nf=(v,d=0)=>v==null||!isFinite(v)?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
 const pc=v=>v==null||!isFinite(v)?"—":nf(v*100,1)+"%";
-const TABS=[["vg","Visão geral"],["ex","Exportações e preços"],["od","Oferta e demanda"],["cl","Custos e lucro"],["pr","Produtividade"],["lg","Logística e portos"],["sc","Cenários"],["dm","Dados e metodologia"],["cn","Conclusão"]];
+const TABS=[["vg","Visão geral"],["ex","Exportações e preços"],["od","Oferta e demanda"],["cl","Custos e lucro"],["pr","Produtividade"],["lg","Logística e portos"],["sc","Cenários"],["cn","Conclusão"]];
 TABS.forEach(([k,n])=>{const b=document.createElement("button");b.textContent=n;b.dataset.k=k;b.onclick=()=>show(k);$("#nav").append(b)});
 function show(k){$$(".tab").forEach(t=>t.classList.toggle("on",t.id=="t-"+k));$$("nav button").forEach(b=>b.classList.toggle("on",b.dataset.k==k));render()}
 let rows=[],F={y0:"",y1:"",pais:"",uf:""},CH={};
@@ -122,7 +111,7 @@ const fr=()=>rows.filter(o=>(!F.y0||o.a>=+F.y0)&&(!F.y1||o.a<=+F.y1)&&(!F.pais||
 function grp(a,kf){const m={};a.forEach(o=>{const k=kf(o);(m[k]=m[k]||{kg:0,fob:0});m[k].kg+=o.kg;m[k].fob+=o.fob});return Object.entries(m).map(([k,v])=>({k,t:v.kg/1000,fob:v.fob,p:v.fob/(v.kg/1000)}))}
 const yearly=()=>grp(fr(),o=>o.a).sort((a,b)=>a.k-b.k);
 const monthly=()=>grp(fr().filter(o=>o.m>0),o=>o.a+"-"+String(o.m).padStart(2,"0")).sort((a,b)=>a.k<b.k?-1:1);
-const nodata='<div class="warn">Sem dados: importe o CSV do Comex Stat na aba “Dados e metodologia”. Nenhum valor é inventado.</div>';
+const nodata='<div class="warn">Sem dados disponíveis. Nenhum valor é inventado.</div>';
 /* ---- cost model ---- */
 const C=q=>5e6+180*q+6e-4*q*q,qs=P=>Math.max(0,(P-180)/0.0012),Pnet=()=>+$("#Pn").value;
 const qCMe=Math.sqrt(5e6/6e-4),CMeMin=5e6/qCMe+180+6e-4*qCMe;
